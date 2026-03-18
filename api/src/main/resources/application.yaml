@@ -1,0 +1,40 @@
+spring:
+  application:
+    name: api-service
+
+  cloud:
+    gateway:
+      server:
+        webmvc:
+          routes:
+            - id: product-service
+              uri: lb://product-service
+              predicates:
+                - Path=/api/product/**
+
+            - id: order-service
+              uri: lb://order-service
+              predicates:
+                - Path=/api/order/**
+
+            - id: inventory-service
+              uri: lb://inventory-service
+              predicates:
+                - Path=/api/inventory/**
+
+            - id: payment-service
+              uri: lb://payment-service
+              predicates:
+                - Path=/api/payment/**
+
+server:
+  port: 3000
+  error:
+    include-message: always
+    include-binding-errors: always
+    include-stacktrace: never
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka
