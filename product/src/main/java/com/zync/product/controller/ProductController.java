@@ -3,11 +3,13 @@ package com.zync.product.controller;
 import com.zync.product.dto.CreateProductDto;
 import com.zync.product.entity.ProductEntity;
 import com.zync.product.service.ProductService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @RestController
@@ -27,21 +29,13 @@ public class ProductController {
 
     @GetMapping("/{id}")
     public ProductEntity getProductById(@PathVariable UUID id) {
-        try {
-            Optional<ProductEntity> findProduct = productService.getProductById(id);
-            return findProduct.orElse(null);
-        } catch (RuntimeException e) {
-            throw new RuntimeException(e);
-        }
+        return productService.getProductById(id)
+                .orElseThrow(() -> new RuntimeException("Product not found"));
     }
 
     @PostMapping
-    public String createProduct(@RequestBody CreateProductDto body) {
-       try {
-           productService.createProduct(body);
-           return "Created product";
-       } catch (RuntimeException e) {
-           throw new RuntimeException(e);
-       }
+    public ResponseEntity<String> createProduct(@Valid @RequestBody CreateProductDto body) {
+        productService.createProduct(body);
+        return ResponseEntity.status(HttpStatus.CREATED).body("Created product");
     }
 }

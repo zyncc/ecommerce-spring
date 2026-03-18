@@ -1,0 +1,105 @@
+services:
+  postgres-db:
+    image: postgres:18
+    container_name: postgres-db
+    environment:
+      - POSTGRES_DB=ecommerce
+      - POSTGRES_USER=zync
+      - POSTGRES_PASSWORD=zync
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U zync -d ecommerce"]
+  discovery-service:
+    image: zync07/ecommerce-discovery-service:latest
+    container_name: discovery-service
+    ports:
+      - "8761:8761"
+    environment:
+      - EUREKA_INSTANCE_HOSTNAME=discovery-service
+    healthcheck:
+      test:
+        ["CMD-SHELL", "curl -f http://localhost:8761/actuator/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  api-gateway:
+    image: zync07/ecommerce-api-gateway:latest
+    container_name: api-gateway
+    ports:
+      - "3000:3000"
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-service:8761/eureka
+      - EUREKA_INSTANCE_PREFER_IP_ADDRESS=true
+    depends_on:
+      discovery-service:
+        condition: service_started
+
+  product-service:
+    image: zync07/ecommerce-product-service:latest
+    container_name: product-service
+    ports:
+      - "3001:3001"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-db:5432/ecommerce
+      - SPRING_DATASOURCE_USERNAME=zync
+      - SPRING_DATASOURCE_PASSWORD=zync
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-service:8761/eureka
+      - EUREKA_INSTANCE_PREFER_IP_ADDRESS=true
+    depends_on:
+      postgres-db:
+        condition: service_healthy
+      discovery-service:
+        condition: service_started
+
+  inventory-service:
+    image: zync07/ecommerce-inventory-service:latest
+    container_name: inventory-service
+    ports:
+      - "3002:3002"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-db:5432/ecommerce
+      - SPRING_DATASOURCE_USERNAME=zync
+      - SPRING_DATASOURCE_PASSWORD=zync
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-service:8761/eureka
+      - EUREKA_INSTANCE_PREFER_IP_ADDRESS=true
+    depends_on:
+      postgres-db:
+        condition: service_healthy
+      discovery-service:
+        condition: service_started
+
+  order-service:
+    image: zync07/ecommerce-order-service:latest
+    container_name: order-service
+    ports:
+      - "3003:3003"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-db:5432/ecommerce
+      - SPRING_DATASOURCE_USERNAME=zync
+      - SPRING_DATASOURCE_PASSWORD=zync
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-service:8761/eureka
+      - EUREKA_INSTANCE_PREFER_IP_ADDRESS=true
+    depends_on:
+      postgres-db:
+        condition: service_healthy
+      discovery-service:
+        condition: service_started
+
+  payment-service:
+    image: zync07/ecommerce-payment-service:latest
+    container_name: payment-service
+    ports:
+      - "3004:3004"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-db:5432/ecommerce
+      - SPRING_DATASOURCE_USERNAME=zync
+      - SPRING_DATASOURCE_PASSWORD=zync
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-service:8761/eureka
+      - EUREKA_INSTANCE_PREFER_IP_ADDRESS=true
+    depends_on:
+      postgres-db:
+        condition: service_healthy
+      discovery-service:
+        condition: service_started

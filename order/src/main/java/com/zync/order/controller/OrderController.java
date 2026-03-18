@@ -4,6 +4,7 @@ import com.zync.order.dto.CreateOrderDto;
 import com.zync.order.dto.UpdateOrderDto;
 import com.zync.order.entity.OrderEntity;
 import com.zync.order.service.OrderService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,7 +32,7 @@ public class OrderController {
     }
 
     @PostMapping
-    public ResponseEntity<String> createOrder(@RequestBody CreateOrderDto body) {
+    public ResponseEntity<String> createOrder(@Valid  @RequestBody CreateOrderDto body) {
         try {
             String paymentLink = orderService.createOrder(body);
             return ResponseEntity.status(HttpStatus.CREATED).body("Payment Link: " + paymentLink);

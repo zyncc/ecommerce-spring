@@ -2,6 +2,7 @@ package com.zync.payment.controller;
 
 import com.zync.payment.dto.OrderResponseDto;
 import com.zync.payment.service.PaymentService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,7 +16,7 @@ public class PaymentController {
     private final PaymentService paymentService;
 
     @PostMapping("/webhook")
-    public ResponseEntity<String> paymentSuccessWebhook(@RequestBody OrderResponseDto order) {
+    public ResponseEntity<String> paymentSuccessWebhook(@Valid @RequestBody OrderResponseDto order) {
         paymentService.handlePaymentWebhook(order);
         return ResponseEntity.ok("Webhook successful");
     }

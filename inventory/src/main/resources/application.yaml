@@ -3,9 +3,9 @@ spring:
     name: inventory-service
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/ecommerce
-    username: zync
-    password: zync
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/ecommerce}
+    username: ${SPRING_DATASOURCE_USERNAME:zync}
+    password: ${SPRING_DATASOURCE_PASSWORD:zync}
     driver-class-name: org.postgresql.Driver
 
   jpa:
@@ -25,6 +25,8 @@ server:
     include-stacktrace: never
 
 eureka:
+  instance:
+    prefer-ip-address: ${EUREKA_INSTANCE_PREFER_IP_ADDRESS:true}
   client:
     serviceUrl:
-      defaultZone: http://localhost:8761/eureka
+      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://localhost:8761/eureka}

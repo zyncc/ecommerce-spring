@@ -1,4 +1,4 @@
-package com.zync.product.exception;
+package com.zync.order.exception;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
